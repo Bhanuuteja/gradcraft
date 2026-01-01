@@ -34,7 +34,8 @@ export const signup = async (email: string, password: string, name: string): Pro
         email,
         password,
         options: {
-            data: { full_name: name }
+            data: { full_name: name },
+            emailRedirectTo: window.location.origin
         }
     });
 
