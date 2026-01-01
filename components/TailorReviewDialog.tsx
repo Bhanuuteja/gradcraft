@@ -21,6 +21,7 @@ const TailorReviewDialog: React.FC<TailorReviewDialogProps> = ({ original, optio
     // "A" and "B" are the starting points. "Custom" captures refinements.
     const [currentData, setCurrentData] = useState<ResumeData>(options.optionA);
     const [activeTab, setActiveTab] = useState<'A' | 'B'>('A');
+    const [view, setView] = useState<'resume' | 'cover-letter'>('resume');
     const [chatInput, setChatInput] = useState('');
     const [isRefining, setIsRefining] = useState(false);
     const [feedback, setFeedback] = useState<string | null>(null);
@@ -140,9 +141,26 @@ const TailorReviewDialog: React.FC<TailorReviewDialogProps> = ({ original, optio
                     </div>
 
                     {/* Preview Area */}
-                    <div className="flex-1 bg-slate-100 dark:bg-black p-8 overflow-y-auto flex justify-center items-start custom-scrollbar">
+                    <div className="flex-1 bg-slate-100 dark:bg-black p-8 overflow-y-auto flex flex-col items-center justify-start custom-scrollbar relative">
+
+                        {/* View Toggle */}
+                        <div className="sticky top-0 z-10 bg-white dark:bg-neutral-800 p-1 rounded-full shadow-lg border border-slate-200 dark:border-neutral-700 mb-6 flex gap-1">
+                            <button
+                                onClick={() => setView('resume')}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${view === 'resume' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-neutral-700'}`}
+                            >
+                                Resume
+                            </button>
+                            <button
+                                onClick={() => setView('cover-letter')}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${view === 'cover-letter' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-neutral-700'}`}
+                            >
+                                Cover Letter
+                            </button>
+                        </div>
+
                         <div className="scale-[0.85] origin-top shadow-2xl transition-all duration-300 ease-in-out">
-                            <LivePreview data={currentData} />
+                            <LivePreview data={currentData} activeDoc={view} />
                         </div>
                     </div>
 

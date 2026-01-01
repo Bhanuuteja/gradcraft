@@ -15,35 +15,58 @@ export const tailorResume = async (currentResume: ResumeData, jobDescription: st
     }
 
     const prompt = `
-    You are a **RUTHLESS & BRUTAL Resume Critic**. 
+    You are an expert Resume Strategist.
     
-    **PART 1: THE ROAST**
-    First, analyze the provided RESUME DATA against the JOB DESCRIPTION.
-    Be mean. Be honest. Tell the candidate exactly why they wouldn't get hired. 
-    Call out generic buzzwords, weak metrics, or lack of focus. 
-    (Max 3 concise, savage bullet points).
+    **TASK:**
+    Analyze the RESUME and the JOB DESCRIPTION (JD).
+    Then, generate **TWO tailored versions** of the resume content and a critique.
 
-    **PART 2: THE FIX**
-    Tailor the resume to match the JD and provide **TWO DISTINCT VARIATIONS**.
+    **1. CRITIQUE ("The Roast")**
+    - Be brutally honest. Identify buzzwords, weak metrics, and generic phrasing.
+    - Max 3 bullet points.
 
-    **VARIATION A: "Conservative Match"**
-    - Focus on direct keyword matching.
-    - Keep tone professional, safe, and factual.
-    - Prioritize exact skill matches from the JD.
+    **2. OPTION A ("Conservative Match")**
+    - High keyword matching.
+    - Professional, standard tone.
+    - Focus on stability and hard skills.
 
-    **VARIATION B: "Bold & Action-Oriented"**
-    - Use strong action verbs and executive language.
-    - Rewrite bullet points to be achievement-focused (STAR method).
-    - Highlight leadership and impact.
+    **3. OPTION B ("Bold & Action-Oriented")**
+    - Executive/Leader tone.
+    - Strong STAR-method bullet points.
+    - Emphasize impact, results, and confidence.
 
-    **OUTPUT FORMAT (JSON ONLY):**
-    Return a single JSON object with three keys: "optionA", "optionB", and "critique".
+    **4. OPTION A & B DETAILS:**
+    - **Option A (Conservative)**: Professional, standard tone. Matching cover letter emphasizes reliability and experience.
+    - **Option B (Bold)**: Executive/Leader tone. Matching cover letter is confident, succinct, and value-driven.
+
+    **REQUIRED OUTPUT FORMAT (JSON):**
+    You must return a JSON object with this EXACT structure. 
+    **IMPORTANT:** For 'optionA' and 'optionB', return the *Full* updated objects for 'personalInfo', 'experience', 'skills', and 'projects'.
+    Also include a **Full Cover Letter** object for each option.
     
-    Example:
     {
-      "critique": "1. Your summary is boring. 2. No metrics in experience. 3. Skills are a mess.",
-      "optionA": { ...resumeData... },
-      "optionB": { ...resumeData... }
+      "critique": "string",
+      "optionA": {
+        "personalInfo": { ...keep existing, update 'summary' to match JD... },
+        "skills": [ 
+           { "name": "Technical/Hard Skills", "items": "Java, Python, React, TypeScript (Comma separated)" },
+           { "name": "Soft Skills", "items": "Leadership, Communication, problem-solving" }
+        ],
+        "experience": [ ...rewritten descriptions to match JD... ],
+        "projects": [ ...rewritten descriptions... ],
+        "coverLetter": {
+            "recipientName": "Hiring Manager",
+            "recipientTitle": "Hiring Manager",
+            "companyName": "[Company Name from JD]",
+            "companyAddress": "[Address or City from JD]",
+            "date": "Today's Date",
+            "content": "[Highly tailored 3-4 paragraph cover letter matching the tone of Option A]"
+        }
+      },
+      "optionB": { 
+          // ...Same structure as Option A but with bold/executive content and bold cover letter... 
+          "coverLetter": { ... }
+      }
     }
 
     RESUME DATA:
@@ -75,28 +98,31 @@ export const tailorResume = async (currentResume: ResumeData, jobDescription: st
 
         const data = await response.json();
         const content = data.choices[0].message.content;
-        const parsed: { optionA: ResumeData, optionB: ResumeData, critique: string } = JSON.parse(content);
+        const parsed = JSON.parse(content);
 
         // Helper to merge results safely
-        const mergeSafe = (base: ResumeData, newVariant: Partial<ResumeData>): ResumeData => ({
-            ...base,
-            personalInfo: { ...base.personalInfo, ...newVariant.personalInfo },
-            skills: newVariant.skills || base.skills,
-            experience: newVariant.experience || base.experience,
-            projects: newVariant.projects || base.projects,
-            education: newVariant.education || base.education,
-            title: newVariant.title || base.title, // Keep or update title if AI suggests
-            // Preserve other fields
-            customSections: base.customSections,
-            sectionOrder: base.sectionOrder,
-            design: base.design,
-            coverLetter: base.coverLetter
-        });
+        const mergeSafe = (base: ResumeData, newVariant: any): ResumeData => {
+            if (!newVariant) return base;
+            return {
+                ...base,
+                personalInfo: { ...base.personalInfo, ...(newVariant.personalInfo || {}) },
+                skills: newVariant.skills && Array.isArray(newVariant.skills) ? newVariant.skills : base.skills,
+                experience: newVariant.experience && Array.isArray(newVariant.experience) ? newVariant.experience : base.experience,
+                projects: newVariant.projects && Array.isArray(newVariant.projects) ? newVariant.projects : base.projects,
+                // Preserve others
+                education: base.education,
+                customSections: base.customSections,
+                sectionOrder: base.sectionOrder,
+                design: base.design,
+                // Update Cover Letter if provided, otherwise keep base
+                coverLetter: newVariant.coverLetter || base.coverLetter
+            };
+        };
 
         return {
             optionA: mergeSafe(currentResume, parsed.optionA),
             optionB: mergeSafe(currentResume, parsed.optionB),
-            critique: parsed.critique || "Your resume was too boring to even roast."
+            critique: parsed.critique || "Review complete."
         };
 
     } catch (error) {
@@ -121,6 +147,11 @@ export const refineResume = async (currentResume: ResumeData, instruction: strin
     - Only modify the fields relevant to the instruction.
     - Keep the rest of the data exactly as is.
     - If the user asks for a specific tone (e.g. "arrogant", "funny", "professional"), adopt it ONLY for the content rewriting.
+    
+    **STRUCTURAL CHANGES (Adding Sections):**
+    - If the user asks to add a NEW section (e.g. "Add a Certificates section"), you MUST:
+      1. Create a new entry in 'customSections' with a unique ID (e.g. "custom-certificates").
+      2. Add that same ID to the 'sectionOrder' array where it belongs.
     
     **OUTPUT FORMAT (JSON ONLY):**
     Return the fully valid ResumeData JSON object.
@@ -158,11 +189,14 @@ export const refineResume = async (currentResume: ResumeData, instruction: strin
             experience: refined.experience || currentResume.experience,
             projects: refined.projects || currentResume.projects,
             education: refined.education || currentResume.education,
-            title: refined.title || currentResume.title,
-            customSections: currentResume.customSections,
-            sectionOrder: currentResume.sectionOrder,
+
+            // Allow AI to add/modify custom sections (e.g. "Certificates")
+            customSections: refined.customSections || currentResume.customSections,
+            // Allow AI to update order if new sections are added
+            sectionOrder: refined.sectionOrder && Array.isArray(refined.sectionOrder) ? refined.sectionOrder : currentResume.sectionOrder,
+
             design: currentResume.design,
-            coverLetter: currentResume.coverLetter
+            coverLetter: refined.coverLetter || currentResume.coverLetter
         };
     } catch (error) {
         console.error("Refinement Failed:", error);
