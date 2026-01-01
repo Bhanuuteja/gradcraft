@@ -39,6 +39,12 @@ export const signup = async (email: string, password: string, name: string): Pro
     });
 
     if (error) throw error;
+
+    // Check if user already exists (Supabase returns empty identities for security)
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+        throw new Error("This email is already registered. Please sign in instead.");
+    }
+
     if (!data.user) throw new Error("No user created");
 
     // If email confirmation is enabled, session will be null
