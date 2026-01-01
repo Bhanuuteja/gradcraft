@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GradCraft - Student Resume Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+            latex: ['Merriweather', 'serif'],
+          },
+          colors: {
+            brand: {
+              primary: '#2563eb',
+              accent: '#1e40af',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer components {
+        .input-field {
+          @apply w-full p-3 border border-slate-200 dark:border-neutral-800 rounded-xl focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary focus:outline-none transition-all text-sm text-slate-700 dark:text-white bg-slate-50 dark:bg-neutral-900 placeholder-slate-400 font-medium;
+        }
+        .btn-brand {
+          @apply bg-brand-primary hover:bg-brand-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50;
+        }
+        .card-brand {
+          @apply bg-white dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300;
+        }
+      }
+    </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Poppins:wght@400;600;700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 10px;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+    }
+
+    @media print {
+      @page {
+        margin: 0;
+        size: A4;
+      }
+
+      body {
+        margin: 0;
+        background: white;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    /* Single page constraint for PDF */
+    .pdf-export-mode {
+      width: 210mm !important;
+      height: 297mm !important;
+      overflow: hidden !important;
+      position: relative !important;
+    }
+  </style>
+  <!-- Import Map Removed: Vite handles local modules -->
+  <link rel="stylesheet" href="/index.css">
+</head>
+
+<body class="bg-slate-50 dark:bg-black text-slate-900 dark:text-white font-sans antialiased overflow-x-hidden">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>

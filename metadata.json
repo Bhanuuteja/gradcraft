@@ -1,0 +1,5 @@
+{
+  "name": "ATSFreeResumeAlter",
+  "description": "An ATS-focused resume optimizer that generates both LaTeX source and print-ready PDFs.",
+  "requestFramePermissions": []
+}
