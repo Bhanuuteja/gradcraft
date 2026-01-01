@@ -32,7 +32,7 @@ type ViewState = 'LANDING' | 'LOGIN' | 'SIGNUP' | 'DASHBOARD' | 'EDITOR' | 'FORG
 function App() {
   const [view, setView] = useState<ViewState>('LANDING');
   // Capture recovery mode immediately before Supabase strips the URL
-  const [isRecoveryMode] = useState(() => window.location.hash.includes('type=recovery'));
+  const [isRecoveryMode] = useState(() => window.location.hash.includes('type=recovery') || window.location.search.includes('mode=reset'));
   const [user, setUser] = useState<User | null>(null);
   const [isDbReady, setIsDbReady] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData>(initialData);
