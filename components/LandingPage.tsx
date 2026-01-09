@@ -159,7 +159,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onLogin }) => {
                             </div>
                             <div className="flex-1 w-full relative">
                                 <div className="relative bg-neutral-50 border border-neutral-200 p-6 rounded-xl text-xs font-mono text-neutral-600 shadow-inner">
-                                    <span className="text-black font-bold">> Processing...</span><br />
+                                    <span className="text-black font-bold">&gt; Processing...</span><br />
                                     Generating keywords: <span className="bg-neutral-200 px-1 rounded">React</span> <span className="bg-neutral-200 px-1 rounded">TypeScript</span><br />
                                     <span className="text-green-600 font-bold">Match Score: 95%</span>
                                 </div>
