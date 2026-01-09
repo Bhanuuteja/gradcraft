@@ -32,6 +32,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
     // ATS Check State
     const [atsResult, setAtsResult] = useState<ATSScoreResult | null>(null);
     const [isScoring, setIsScoring] = useState(false);
+    const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
+    const [atsForm, setAtsForm] = useState({ jd: '' });
 
     useEffect(() => {
         refresh();
@@ -90,15 +92,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
         }
     };
 
-    const handleCheckScore = async (e: React.MouseEvent, resume: SavedResume) => {
-        e.stopPropagation();
-        const jd = prompt("Paste the Job Description to check this resume's score:");
-        if (!jd) return;
-
+    // New Handler for the Global ATS Check Modal
+    const handleRunAtsCheck = async () => {
+        if (!selectedBaseresume || !atsForm.jd) return;
         setIsScoring(true);
         try {
-            const result = await calculateATSScore(resume.data, jd);
+            const result = await calculateATSScore(selectedBaseresume.data, atsForm.jd);
             setAtsResult(result);
+            setIsAtsModalOpen(false);
         } catch (error: any) {
             alert('Scoring failed: ' + error.message);
         } finally {
@@ -106,16 +107,20 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
         }
     };
 
+    // Keep the individual card handler for quick access
+    const handleCheckScoreCard = async (e: React.MouseEvent, resume: SavedResume) => {
+        e.stopPropagation();
+        setSelectedBaseResume(resume);
+        setIsAtsModalOpen(true);
+    };
+
     const handleReviewSelect = async (selectedData: ResumeData, variantLabel: string) => {
         if (!user || !selectedBaseresume) return;
 
         try {
             const newName = `${tailorForm.title || variantLabel} @ ${tailorForm.company || 'New Job'}`;
-
-            // 1. Save new resume
             const savedResume = await saveResume(user.id, selectedData, undefined, newName);
 
-            // 2. Auto-create application entry
             if (tailorForm.company && tailorForm.title) {
                 await saveApplication({
                     userId: user.id,
@@ -129,7 +134,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
             }
 
             await refresh();
-            setReviewData(null); // Close review dialog
+            setReviewData(null);
             setTailorForm({ title: '', company: '', jd: '' });
         } catch (error) {
             console.error("Failed to save selection:", error);
@@ -175,9 +180,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                         <p className="text-slate-500 font-medium text-xs mt-0.5">Manage your resumes and job applications.</p>
                     </div>
                     <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full md:w-auto">
-
                         <button onClick={() => { setSelectedBaseResume(resumes[0] || null); setIsTailorOpen(true); }} className="flex-1 md:flex-none bg-brand-primary text-white border-2 border-brand-primary px-5 py-2.5 rounded-xl font-bold uppercase tracking-wide text-xs transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-brand-primary/20 hover:bg-brand-accent">
                             <Sparkles className="w-4 h-4" /> AI Tailor
+                        </button>
+                        <button onClick={() => { setSelectedBaseResume(resumes[0] || null); setIsAtsModalOpen(true); }} className="flex-1 md:flex-none bg-indigo-600 text-white border-2 border-indigo-600 px-5 py-2.5 rounded-xl font-bold uppercase tracking-wide text-xs transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-indigo-600/20 hover:bg-indigo-700">
+                            <Target className="w-4 h-4" /> Check Score
                         </button>
                         <button onClick={onNew} className="flex-1 md:flex-none bg-white dark:bg-neutral-800 border-2 border-slate-200 dark:border-neutral-800 px-5 py-2.5 rounded-xl font-bold uppercase tracking-wide text-xs transition-all flex items-center justify-center gap-2 active:scale-95">
                             <Plus className="w-4 h-4" /> New Resume
@@ -213,7 +220,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                                         <div className="flex justify-between items-start mb-3">
                                             <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-neutral-800 flex items-center justify-center text-slate-400 group-hover:text-brand-primary transition-colors"><FileText className="w-4 h-4" /></div>
                                             <div className="flex gap-1">
-                                                <button onClick={(e) => handleCheckScore(e, resume)} className="p-1.5 text-slate-300 hover:text-violet-500 transition-all" title="Check ATS Score"><Award className="w-4 h-4" /></button>
+                                                <button onClick={(e) => handleCheckScoreCard(e, resume)} className="p-1.5 text-slate-300 hover:text-violet-500 transition-all" title="Check ATS Score"><Award className="w-4 h-4" /></button>
                                                 <button onClick={(e) => handleDeleteResume(e, resume.id)} className="p-1.5 text-slate-300 hover:text-red-500 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                                             </div>
                                         </div>
@@ -303,7 +310,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                 )}
             </div>
 
-            {/* Loading Overlay for ATS Check */}
+            {/* Loading Overlay */}
             {isScoring && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white dark:bg-neutral-900 p-8 rounded-2xl flex flex-col items-center shadow-2xl">
@@ -316,6 +323,50 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
 
             {/* ATS Score Modal */}
             {atsResult && <ATSScoreCard result={atsResult} onClose={() => setAtsResult(null)} />}
+
+            {/* ATS Check Input Modal */}
+            {isAtsModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-neutral-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-neutral-800 flex flex-col max-h-[90vh]">
+                        <div className="p-6 md:p-8 border-b border-slate-100 dark:border-neutral-800 flex justify-between items-center bg-slate-50 dark:bg-neutral-950">
+                            <div>
+                                <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 dark:text-white">Check ATS Score</h3>
+                                <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mt-1">Select a resume and paste the job description to get a grade.</p>
+                            </div>
+                            <button onClick={() => setIsAtsModalOpen(false)} className="p-2 hover:bg-slate-200 dark:hover:bg-neutral-800 rounded-full transition-colors"><div className="w-5 h-5 flex items-center justify-center font-bold">✕</div></button>
+                        </div>
+                        <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Resume to Check</label>
+                                <select
+                                    className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-xl font-bold text-sm focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all appearance-none"
+                                    value={selectedBaseresume?.id || ''}
+                                    onChange={(e) => setSelectedBaseResume(resumes.find(r => r.id === e.target.value) || null)}
+                                >
+                                    {resumes.map(r => (
+                                        <option key={r.id} value={r.id}>{r.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Job Description</label>
+                                <textarea
+                                    placeholder="Paste the Job Description here..."
+                                    value={atsForm.jd}
+                                    onChange={e => setAtsForm({ jd: e.target.value })}
+                                    className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-xl font-medium text-sm h-64 resize-none focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all custom-scrollbar leading-relaxed"
+                                />
+                            </div>
+                        </div>
+                        <div className="p-6 md:p-8 border-t border-slate-100 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-950 flex justify-end gap-3">
+                            <button onClick={() => setIsAtsModalOpen(false)} className="px-6 py-3 font-bold uppercase tracking-widest text-xs text-slate-400 hover:text-slate-600 transition-colors">Cancel</button>
+                            <button onClick={handleRunAtsCheck} disabled={isScoring || !atsForm.jd || !selectedBaseresume} className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                {isScoring ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring...</> : <><Target className="w-4 h-4" /> Check Score</>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Tailor Modal */}
             {isTailorOpen && (
