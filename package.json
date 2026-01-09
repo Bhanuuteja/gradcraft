@@ -11,18 +11,21 @@
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@supabase/supabase-js": "^2.89.0",
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "docx": "8.5.0",
     "dotenv": "^16.6.1",
     "express": "^5.2.1",
     "file-saver": "2.0.5",
+    "framer-motion": "^12.25.0",
     "groq-sdk": "^0.37.0",
     "lucide-react": "^0.561.0",
     "mammoth": "^1.11.0",
     "nodemon": "^3.1.11",
     "pdfjs-dist": "^5.4.449",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

@@ -4,6 +4,7 @@ import ResumeForm from './components/ResumeForm';
 import LivePreview from './components/LivePreview';
 import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';
+import LandingPage from './components/LandingPage';
 import { ResumeData, User } from './types';
 import { getCurrentUser, saveResume, supabase } from './services/supabase';
 import { downloadDocx } from './services/docxService';
@@ -247,16 +248,10 @@ function App() {
 
 
       {view === 'LANDING' && (
-        <div className="flex-1 bg-white dark:bg-black flex flex-col items-center justify-center p-6 text-center overflow-y-auto font-sans">
-          <div className="w-full max-w-[260px] md:max-w-[320px] mb-8 hover:scale-105 transition-transform duration-300">
-            <img src="/logo.png" alt="GradCraft" className="w-full h-auto drop-shadow-2xl" />
-          </div>
-          <p className="text-sm md:text-base text-slate-500 mb-8 max-w-md font-medium leading-relaxed">Build a professional resume for your student career in minutes. Simple, fast, and ATS-ready.</p>
-          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
-            <button onClick={() => setView('SIGNUP')} className="btn-brand flex-1 py-3 text-sm uppercase tracking-widest font-bold">Get Started</button>
-            <button onClick={() => setView('LOGIN')} className="flex-1 py-3 border-2 border-slate-200 dark:border-neutral-800 rounded-xl font-black text-sm hover:bg-slate-50 dark:hover:bg-neutral-900 transition-all dark:text-white uppercase tracking-widest">Sign In</button>
-          </div>
-        </div>
+        <LandingPage
+          onStart={() => setView('SIGNUP')}
+          onLogin={() => setView('LOGIN')}
+        />
       )}
 
       {(view === 'LOGIN' || view === 'SIGNUP' || view === 'FORGOT_PASSWORD' || view === 'UPDATE_PASSWORD') && (
