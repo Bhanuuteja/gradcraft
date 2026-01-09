@@ -7,10 +7,7 @@ import Dashboard from './components/Dashboard';
 import { ResumeData, User } from './types';
 import { getCurrentUser, saveResume, supabase } from './services/supabase';
 import { downloadDocx } from './services/docxService';
-import { calculateATSScore } from './services/groqService';
-import ATSScoreCard from './components/ATSScoreCard';
-import { ATSScoreResult } from './types';
-import { ArrowLeft, Save, Sparkles, FileDown, Moon, Sun, Layout, Eye, Edit3, Menu, X, Award } from 'lucide-react';
+import { ArrowLeft, Save, Sparkles, FileDown, Moon, Sun, Layout, Eye, Edit3, Menu, X } from 'lucide-react';
 
 const initialData: ResumeData = {
   personalInfo: {
@@ -46,8 +43,6 @@ function App() {
   const [status, setStatus] = useState<{ type: 'success' | 'error', msg: string } | null>(null);
   const [mobileMode, setMobileMode] = useState<'edit' | 'preview'>('edit');
   const [previewScale, setPreviewScale] = useState(1);
-  const [atsResult, setAtsResult] = useState<ATSScoreResult | null>(null);
-  const [isScoring, setIsScoring] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -138,23 +133,6 @@ function App() {
       setCurrentResumeId(saved.id);
       notify('success', 'Saved');
     } catch (e: any) { notify('error', 'Sync Failed: ' + e.message); }
-  };
-
-  const handleCheckScore = async () => {
-    const jd = prompt("Paste the Job Description to check your resume score:");
-    if (!jd) return;
-
-    setIsScoring(true);
-    notify('success', 'Analyzing Resume vs JD... this takes ~10s');
-
-    try {
-      const result = await calculateATSScore(resumeData, jd);
-      setAtsResult(result);
-    } catch (error: any) {
-      notify('error', 'Scoring failed: ' + error.message);
-    } finally {
-      setIsScoring(false);
-    }
   };
 
   const handleDownloadPdf = () => {
@@ -266,7 +244,7 @@ function App() {
         </div>
       )}
 
-      {atsResult && <ATSScoreCard result={atsResult} onClose={() => setAtsResult(null)} />}
+
 
       {view === 'LANDING' && (
         <div className="flex-1 bg-white dark:bg-black flex flex-col items-center justify-center p-6 text-center overflow-y-auto font-sans">
@@ -330,15 +308,6 @@ function App() {
                 <button onClick={() => setActiveDoc('cover-letter')} className={`px-3 md:px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeDoc === 'cover-letter' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-primary' : 'text-slate-500'}`}>Letter</button>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={handleCheckScore}
-                  disabled={isScoring}
-                  className="px-3 md:px-5 py-2.5 bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 rounded-xl font-black uppercase tracking-[0.1em] text-[10px] hover:bg-violet-200 dark:hover:bg-violet-900/50 transition-all flex items-center gap-2 disabled:opacity-50"
-                >
-                  {isScoring ? <span className="animate-spin">⏳</span> : <Award className="w-4 h-4" />}
-                  <span className="hidden md:inline">Check Score</span>
-                </button>
-
                 <button onClick={handleDownloadPdf} className="btn-brand !py-2.5 !px-3 md:!px-5 text-[10px] md:text-sm uppercase tracking-widest">PDF</button>
                 <button onClick={handleSave} className="p-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-[0.1em] text-[10px] hover:bg-brand-primary hover:text-white transition-all shadow-lg px-3 md:px-4">Save</button>
               </div>
