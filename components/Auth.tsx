@@ -93,12 +93,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
     };
 
     return (
+    return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 animate-in fade-in duration-500">
-            <div className="w-full max-w-md bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-slate-200 dark:border-neutral-800 p-8">
+            <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-neutral-200 p-8">
                 <div className="text-center mb-8">
-                    <img src="/logo.png" alt="GradCraft" className="w-32 md:w-40 mx-auto mb-6 drop-shadow-md" />
-                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-2">{getTitle()}</p>
-                    <p className="text-slate-400 text-sm mt-1 max-w-[280px] mx-auto leading-relaxed">
+                    <img src="/logo.png" alt="GradCraft" className="w-32 md:w-40 mx-auto mb-6 grayscale" />
+                    <p className="text-neutral-500 text-xs font-bold uppercase tracking-widest mt-2">{getTitle()}</p>
+                    <p className="text-neutral-400 text-sm mt-1 max-w-[280px] mx-auto leading-relaxed">
                         {getDescription()}
                     </p>
                 </div>
@@ -106,14 +107,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {view === 'SIGNUP' && (
                         <div className="space-y-2">
-                            <label className="text-xs font-semibold uppercase text-slate-500">Full Name</label>
+                            <label className="text-xs font-semibold uppercase text-neutral-500">Full Name</label>
                             <div className="relative">
-                                <UserIcon className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                                <UserIcon className="absolute left-3 top-2.5 w-4 h-4 text-neutral-400" />
                                 <input
                                     type="text"
                                     value={name}
                                     onChange={e => setName(e.target.value)}
-                                    className="pl-9 w-full p-2.5 rounded-lg border border-slate-300 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 focus:ring-2 focus:ring-brand-primary focus:outline-none dark:text-white text-sm"
+                                    className="pl-9 w-full p-2.5 rounded-lg border border-neutral-200 bg-neutral-50 focus:ring-2 focus:ring-black focus:border-black focus:outline-none text-neutral-900 text-sm transition-all"
                                     placeholder="John Doe"
                                     required
                                 />
@@ -123,14 +124,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
 
                     {(view !== 'FORGOT_PASSWORD' && view !== 'UPDATE_PASSWORD') && (
                         <div className="space-y-2">
-                            <label className="text-xs font-semibold uppercase text-slate-500">Email Address</label>
+                            <label className="text-xs font-semibold uppercase text-neutral-500">Email Address</label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                                <Mail className="absolute left-3 top-2.5 w-4 h-4 text-neutral-400" />
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
-                                    className={`pl-9 w-full p-2.5 rounded-lg border border-slate-300 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 focus:ring-2 focus:ring-brand-primary focus:outline-none dark:text-white text-sm ${resetStep === 'OTP' ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                    className={`pl-9 w-full p-2.5 rounded-lg border border-neutral-200 bg-neutral-50 focus:ring-2 focus:ring-black focus:border-black focus:outline-none text-neutral-900 text-sm transition-all ${resetStep === 'OTP' ? 'opacity-60 cursor-not-allowed' : ''}`}
                                     placeholder="you@example.com"
                                     required
                                     readOnly={resetStep === 'OTP'}
@@ -141,16 +142,16 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
 
                     {(view !== 'FORGOT_PASSWORD' || resetStep === 'OTP') && (
                         <div className="space-y-2">
-                            <label className="text-xs font-semibold uppercase text-slate-500">
+                            <label className="text-xs font-semibold uppercase text-neutral-500">
                                 {view === 'FORGOT_PASSWORD' ? 'New Password' : 'Password'}
                             </label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                                <Lock className="absolute left-3 top-2.5 w-4 h-4 text-neutral-400" />
                                 <input
                                     type="password"
                                     value={password}
                                     onChange={e => setPassword(e.target.value)}
-                                    className="pl-9 w-full p-2.5 rounded-lg border border-slate-300 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 focus:ring-2 focus:ring-brand-primary focus:outline-none dark:text-white text-sm"
+                                    className="pl-9 w-full p-2.5 rounded-lg border border-neutral-200 bg-neutral-50 focus:ring-2 focus:ring-black focus:border-black focus:outline-none text-neutral-900 text-sm transition-all"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -160,14 +161,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
 
                     {view === 'UPDATE_PASSWORD' && (
                         <div className="space-y-2">
-                            <label className="text-xs font-semibold uppercase text-slate-500">Confirm Password</label>
+                            <label className="text-xs font-semibold uppercase text-neutral-500">Confirm Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                                <Lock className="absolute left-3 top-2.5 w-4 h-4 text-neutral-400" />
                                 <input
                                     type="password"
                                     value={confirmPassword}
                                     onChange={e => setConfirmPassword(e.target.value)}
-                                    className="pl-9 w-full p-2.5 rounded-lg border border-slate-300 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 focus:ring-2 focus:ring-brand-primary focus:outline-none dark:text-white text-sm"
+                                    className="pl-9 w-full p-2.5 rounded-lg border border-neutral-200 bg-neutral-50 focus:ring-2 focus:ring-black focus:border-black focus:outline-none text-neutral-900 text-sm transition-all"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -178,14 +179,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
                     {/* OTP Field */}
                     {view === 'FORGOT_PASSWORD' && resetStep === 'OTP' && (
                         <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                            <label className="text-xs font-semibold uppercase text-slate-500">Verification Code</label>
+                            <label className="text-xs font-semibold uppercase text-neutral-500">Verification Code</label>
                             <div className="relative">
-                                <KeyRound className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                                <KeyRound className="absolute left-3 top-2.5 w-4 h-4 text-neutral-400" />
                                 <input
                                     type="text"
                                     value={otp}
                                     onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                    className="pl-9 w-full p-2.5 rounded-lg border border-slate-300 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 focus:ring-2 focus:ring-red-500 focus:outline-none dark:text-white text-sm tracking-widest font-mono"
+                                    className="pl-9 w-full p-2.5 rounded-lg border border-neutral-200 bg-neutral-50 focus:ring-2 focus:ring-black focus:border-black focus:outline-none text-neutral-900 text-sm tracking-widest font-mono transition-all"
                                     placeholder="123456"
                                     required
                                 />
@@ -194,7 +195,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
                                 <button
                                     type="button"
                                     onClick={() => { setResetStep('EMAIL'); setSuccess(null); }}
-                                    className="text-xs text-red-600 hover:text-red-700"
+                                    className="text-xs text-neutral-600 hover:text-black underline"
                                 >
                                     Resend Code / Change Email
                                 </button>
@@ -207,20 +208,20 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
                             <button
                                 type="button"
                                 onClick={() => onSwitch('FORGOT_PASSWORD')}
-                                className="text-xs text-brand-primary hover:text-brand-accent font-medium"
+                                className="text-xs text-neutral-500 hover:text-black font-medium transition-colors"
                             >
                                 Forgot Password?
                             </button>
                         </div>
                     )}
 
-                    {error && <div className="text-red-500 text-sm text-center bg-red-50 dark:bg-red-900/20 p-2 rounded">{error}</div>}
-                    {success && <div className="text-green-600 text-sm text-center bg-green-50 dark:bg-green-900/20 p-2 rounded">{success}</div>}
+                    {error && <div className="text-red-600 text-xs font-medium text-center bg-red-50 p-3 rounded-lg border border-red-100">{error}</div>}
+                    {success && <div className="text-green-600 text-xs font-medium text-center bg-green-50 p-3 rounded-lg border border-green-100">{success}</div>}
 
                     <button
                         type="submit"
                         disabled={loading || (view === 'FORGOT_PASSWORD' && resetStep === 'OTP' && !!success)}
-                        className="w-full py-3 bg-brand-primary hover:bg-brand-accent text-white rounded-lg font-bold shadow-lg shadow-blue-900/20 transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-wait"
+                        className="w-full py-3 bg-black hover:bg-neutral-800 text-white rounded-lg font-bold shadow-lg shadow-black/10 transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-wait"
                     >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                             view === 'LOGIN' ? 'Sign In' :
@@ -234,7 +235,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
                 <div className="mt-6 text-center">
                     <button
                         onClick={() => onSwitch(view === 'LOGIN' ? 'SIGNUP' : 'LOGIN')}
-                        className="text-sm text-slate-600 dark:text-slate-400 hover:text-brand-primary dark:hover:text-brand-primary flex items-center justify-center mx-auto gap-1"
+                        className="text-sm text-neutral-400 hover:text-black flex items-center justify-center mx-auto gap-1 transition-colors"
                     >
                         {view === 'LOGIN' ? "Don't have an account? Sign up" : "Back to Sign In"}
                         {view !== 'FORGOT_PASSWORD' && <ArrowRight className="w-3 h-3" />}

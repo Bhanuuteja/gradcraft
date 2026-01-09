@@ -40,7 +40,6 @@ function App() {
   const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
   const [resumeName, setResumeName] = useState<string>('My Professional Resume');
   const [activeDoc, setActiveDoc] = useState<'resume' | 'cover-letter'>('resume');
-  const [darkMode, setDarkMode] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error', msg: string } | null>(null);
   const [mobileMode, setMobileMode] = useState<'edit' | 'preview'>('edit');
   const [previewScale, setPreviewScale] = useState(1);
@@ -233,19 +232,17 @@ function App() {
     printWindow.document.close();
   };
 
-  if (!isDbReady) return <div className="h-screen bg-black flex items-center justify-center"><div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div></div>;
+  if (!isDbReady) return <div className="h-screen bg-neutral-900 flex items-center justify-center"><div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
-    <div className={`${darkMode ? 'dark' : ''} h-screen overflow-hidden flex flex-col transition-colors duration-300`}>
+    <div className="h-screen overflow-hidden flex flex-col font-sans text-neutral-900 bg-slate-50">
       {status && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in fade-in slide-in-from-top-5">
-          <div className={`px-6 py-3 rounded-2xl shadow-2xl text-xs font-black border tracking-widest uppercase ${status.type === 'error' ? 'bg-brand-primary text-white border-brand-accent' : 'bg-slate-900 text-white border-slate-700'}`}>
+          <div className={`px-6 py-3 rounded-2xl shadow-2xl text-xs font-black border tracking-widest uppercase ${status.type === 'error' ? 'bg-red-600 text-white border-red-800' : 'bg-neutral-900 text-white border-neutral-700'}`}>
             {status.msg}
           </div>
         </div>
       )}
-
-
 
       {view === 'LANDING' && (
         <LandingPage
@@ -255,7 +252,7 @@ function App() {
       )}
 
       {(view === 'LOGIN' || view === 'SIGNUP' || view === 'FORGOT_PASSWORD' || view === 'UPDATE_PASSWORD') && (
-        <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-black">
+        <div className="flex-1 overflow-y-auto bg-slate-50">
           <Auth
             view={view as any}
             onSwitch={(v) => setView(v)}
@@ -265,7 +262,7 @@ function App() {
       )}
 
       {view === 'DASHBOARD' && user && (
-        <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-black">
+        <div className="flex-1 overflow-y-auto bg-slate-50">
           <Dashboard
             user={user}
             onLogout={() => { setUser(null); setView('LANDING'); }}
@@ -288,43 +285,42 @@ function App() {
       )}
 
       {view === 'EDITOR' && (
-        <div className="flex-1 flex flex-col overflow-hidden bg-slate-100 dark:bg-black font-sans transition-colors duration-300">
-          <nav className="bg-white dark:bg-neutral-950 border-b border-slate-200 dark:border-neutral-900 px-4 md:px-6 py-4 flex flex-col sm:flex-row gap-4 justify-between items-center no-print shrink-0 z-50">
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+          <nav className="bg-white border-b border-neutral-200 px-4 md:px-6 py-4 flex flex-col sm:flex-row gap-4 justify-between items-center no-print shrink-0 z-50">
             <div className="flex items-center gap-4 w-full sm:w-auto">
-              <button onClick={() => setView('DASHBOARD')} className="p-3 hover:bg-slate-100 dark:hover:bg-neutral-900 rounded-xl transition-all border border-slate-200 dark:border-neutral-800 text-slate-400"><ArrowLeft className="w-5 h-5" /></button>
+              <button onClick={() => setView('DASHBOARD')} className="p-3 hover:bg-neutral-50 rounded-xl transition-all border border-neutral-200 text-neutral-400 hover:text-black"><ArrowLeft className="w-5 h-5" /></button>
               <div className="flex-1 truncate">
-                <input value={resumeName} onChange={e => setResumeName(e.target.value)} className="bg-transparent font-black text-lg md:text-xl outline-none p-0 w-full truncate border-b-2 border-transparent focus:border-brand-primary transition-all dark:text-white" />
+                <input value={resumeName} onChange={e => setResumeName(e.target.value)} className="bg-transparent font-black text-lg md:text-xl outline-none p-0 w-full truncate border-b-2 border-transparent focus:border-black transition-all text-black" />
               </div>
             </div>
 
             <div className="flex items-center gap-2 md:gap-4 w-full sm:w-auto justify-between sm:justify-end">
-              <div className="flex bg-slate-100 dark:bg-neutral-900 p-1 rounded-xl shrink-0">
-                <button onClick={() => setActiveDoc('resume')} className={`px-3 md:px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeDoc === 'resume' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-primary' : 'text-slate-500'}`}>Resume</button>
-                <button onClick={() => setActiveDoc('cover-letter')} className={`px-3 md:px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeDoc === 'cover-letter' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-primary' : 'text-slate-500'}`}>Letter</button>
+              <div className="flex bg-neutral-100 p-1 rounded-xl shrink-0">
+                <button onClick={() => setActiveDoc('resume')} className={`px-3 md:px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeDoc === 'resume' ? 'bg-white shadow-sm text-black' : 'text-neutral-400'}`}>Resume</button>
+                <button onClick={() => setActiveDoc('cover-letter')} className={`px-3 md:px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeDoc === 'cover-letter' ? 'bg-white shadow-sm text-black' : 'text-neutral-400'}`}>Letter</button>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button onClick={handleDownloadPdf} className="btn-brand !py-2.5 !px-3 md:!px-5 text-[10px] md:text-sm uppercase tracking-widest">PDF</button>
-                <button onClick={handleSave} className="p-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-[0.1em] text-[10px] hover:bg-brand-primary hover:text-white transition-all shadow-lg px-3 md:px-4">Save</button>
+                <button onClick={handleDownloadPdf} className="px-3 py-2.5 rounded-xl text-[10px] uppercase font-bold tracking-widest border-2 border-transparent hover:border-black transition-all">PDF</button>
+                <button onClick={handleSave} className="p-2.5 bg-black text-white rounded-xl font-black uppercase tracking-[0.1em] text-[10px] hover:bg-neutral-800 transition-all shadow-lg px-3 md:px-4">Save</button>
               </div>
             </div>
           </nav>
 
           <main className="flex-1 flex overflow-hidden relative">
             {/* Form Container */}
-            <div className={`flex-1 overflow-hidden flex flex-col border-r border-slate-200 dark:border-neutral-900 bg-white dark:bg-black transition-all duration-300 ${mobileMode === 'preview' ? 'hidden xl:flex' : 'flex'}`}>
+            <div className={`flex-1 overflow-hidden flex flex-col border-r border-neutral-200 bg-white transition-all duration-300 ${mobileMode === 'preview' ? 'hidden xl:flex' : 'flex'}`}>
               <ResumeForm data={resumeData} onChange={setResumeData} activeDoc={activeDoc} />
             </div>
 
             {/* Preview Container - Scalable & Centered */}
             <div
               ref={previewContainerRef}
-              className={`flex-1 xl:flex-[0.8] 2xl:flex-1 bg-slate-100 dark:bg-neutral-900 overflow-y-auto p-4 md:p-8 xl:p-12 flex flex-col items-center custom-scrollbar transition-all duration-300 ${mobileMode === 'edit' ? 'hidden xl:flex' : 'flex'}`}
+              className={`flex-1 xl:flex-[0.8] 2xl:flex-1 bg-neutral-100 overflow-y-auto p-4 md:p-8 xl:p-12 flex flex-col items-center custom-scrollbar transition-all duration-300 ${mobileMode === 'edit' ? 'hidden xl:flex' : 'flex'}`}
             >
               <div
-                className="shadow-[0_60px_120px_-30px_rgba(0,0,0,0.15)] h-fit origin-top transition-transform duration-300 mb-16"
+                className="shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] h-fit origin-top transition-transform duration-300 mb-16"
                 style={{
                   transform: `scale(${previewScale})`,
-                  // Ensure the scaled box takes up the correct amount of space to prevent clipping
                   width: `${816}px`,
                 }}
               >
@@ -333,16 +329,16 @@ function App() {
             </div>
 
             {/* Mobile Navigation Toggle */}
-            <div className="xl:hidden fixed bottom-6 left-1/2 -translate-x-1/2 flex bg-slate-900/90 dark:bg-neutral-900/90 backdrop-blur-xl rounded-3xl p-2 shadow-2xl border border-white/10 z-[100]">
+            <div className="xl:hidden fixed bottom-6 left-1/2 -translate-x-1/2 flex bg-black rounded-3xl p-2 shadow-2xl z-[100]">
               <button
                 onClick={() => setMobileMode('edit')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${mobileMode === 'edit' ? 'bg-brand-primary text-white' : 'text-slate-400'}`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${mobileMode === 'edit' ? 'bg-white text-black' : 'text-neutral-500'}`}
               >
                 <Edit3 className="w-4 h-4" /> Edit
               </button>
               <button
                 onClick={() => setMobileMode('preview')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${mobileMode === 'preview' ? 'bg-brand-primary text-white' : 'text-slate-400'}`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${mobileMode === 'preview' ? 'bg-white text-black' : 'text-neutral-500'}`}
               >
                 <Eye className="w-4 h-4" /> Preview
               </button>
