@@ -203,3 +203,60 @@ export const refineResume = async (currentResume: ResumeData, instruction: strin
         throw error;
     }
 };
+
+export const calculateATSScore = async (resume: ResumeData, jd: string): Promise<import('../types').ATSScoreResult> => {
+    if (!GROQ_API_KEY) throw new Error("Missing Groq API Key");
+
+    const prompt = `
+    You are a Strict ATS (Applicant Tracking System) Algorithm.
+    
+    **TASK:**
+    Analyze the RESUME against the JOB DESCRIPTION (JD).
+    Calculate a match score (0-100) and identify missing keywords and issues.
+
+    **SCORING CRITERIA:**
+    - 90-100: Perfect Match.
+    - 75-89: Good Match.
+    - 50-74: Average Match.
+    - <50: Poor Match.
+
+    **OUTPUT FORMAT (JSON ONLY):**
+    {
+        "score": number, // 0-100
+        "missingKeywords": ["keyword1", "keyword2", ...], // Top 5-10 missing hard skills/requirements
+        "criticalIssues": ["issue1", "issue2", ...], // e.g. "Summary too long", "Missing contact phone", "Dates inconsistency"
+        "positiveSignals": ["signal1", "signal2", ...] // e.g. "Strong action verbs", "Good education match"
+    }
+
+    RESUME JSON:
+    ${JSON.stringify(resume)}
+
+    JOB DESCRIPTION:
+    ${jd}
+    `;
+
+    try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: prompt }],
+                model: 'llama-3.3-70b-versatile',
+                temperature: 0.1, // Low temp for consistent scoring
+                response_format: { type: "json_object" }
+            })
+        });
+
+        if (!response.ok) throw new Error(await response.text());
+
+        const data = await response.json();
+        const content = data.choices[0].message.content;
+        return JSON.parse(content);
+    } catch (error) {
+        console.error("ATS Scoring Failed:", error);
+        throw error;
+    }
+};

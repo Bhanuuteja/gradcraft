@@ -127,3 +127,10 @@ export interface Application {
   appliedDate: number;
   jd?: string;
 }
+
+export interface ATSScoreResult {
+  score: number;
+  missingKeywords: string[];
+  criticalIssues: string[];
+  positiveSignals: string[];
+}
