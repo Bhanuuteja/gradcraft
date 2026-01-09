@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { User, SavedResume, Application, ApplicationStatus, ResumeData } from '../types';
 import { getUserResumes, deleteResume, getApplications, saveApplication, updateApplicationStatus, saveResume, logout, deleteApplication } from '../services/supabase';
-import { tailorResume } from '../services/groqService';
+import { tailorResume, calculateATSScore } from '../services/groqService';
 import TailorReviewDialog from './TailorReviewDialog';
+import ATSScoreCard from './ATSScoreCard';
+import { ATSScoreResult } from '../types';
 
 
-import { FileText, Plus, Trash2, Clock, Sparkles, Building2, Briefcase, Calendar, CheckCircle2, ChevronRight, Loader2, Target, Search, ExternalLink, LogOut, LayoutGrid, ListTodo } from 'lucide-react';
+import { FileText, Plus, Trash2, Clock, Sparkles, Building2, Briefcase, Calendar, CheckCircle2, ChevronRight, Loader2, Target, Search, ExternalLink, LogOut, LayoutGrid, ListTodo, Award } from 'lucide-react';
 
 interface DashboardProps {
     user: User;
@@ -26,6 +28,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
     const [tailorForm, setTailorForm] = useState({ title: '', company: '', jd: '' });
     const [isTailoring, setIsTailoring] = useState(false);
     const [reviewData, setReviewData] = useState<{ original: ResumeData, result: { optionA: ResumeData, optionB: ResumeData, critique: string } } | null>(null);
+
+    // ATS Check State
+    const [atsResult, setAtsResult] = useState<ATSScoreResult | null>(null);
+    const [isScoring, setIsScoring] = useState(false);
 
     useEffect(() => {
         refresh();
@@ -81,6 +87,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
             alert(`Failed to tailor resume: ${e.message || e}`);
         } finally {
             setIsTailoring(false);
+        }
+    };
+
+    const handleCheckScore = async (e: React.MouseEvent, resume: SavedResume) => {
+        e.stopPropagation();
+        const jd = prompt("Paste the Job Description to check this resume's score:");
+        if (!jd) return;
+
+        setIsScoring(true);
+        try {
+            const result = await calculateATSScore(resume.data, jd);
+            setAtsResult(result);
+        } catch (error: any) {
+            alert('Scoring failed: ' + error.message);
+        } finally {
+            setIsScoring(false);
         }
     };
 
@@ -191,6 +213,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                                         <div className="flex justify-between items-start mb-3">
                                             <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-neutral-800 flex items-center justify-center text-slate-400 group-hover:text-brand-primary transition-colors"><FileText className="w-4 h-4" /></div>
                                             <div className="flex gap-1">
+                                                <button onClick={(e) => handleCheckScore(e, resume)} className="p-1.5 text-slate-300 hover:text-violet-500 transition-all" title="Check ATS Score"><Award className="w-4 h-4" /></button>
                                                 <button onClick={(e) => handleDeleteResume(e, resume.id)} className="p-1.5 text-slate-300 hover:text-red-500 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                                             </div>
                                         </div>
@@ -280,9 +303,19 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                 )}
             </div>
 
+            {/* Loading Overlay for ATS Check */}
+            {isScoring && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-neutral-900 p-8 rounded-2xl flex flex-col items-center shadow-2xl">
+                        <Loader2 className="w-10 h-10 animate-spin text-brand-primary mb-4" />
+                        <h3 className="font-bold text-lg">Analyzing Resume...</h3>
+                        <p className="text-slate-500 text-sm">Please wait while the ATS engine grades your resume.</p>
+                    </div>
+                </div>
+            )}
 
-
-
+            {/* ATS Score Modal */}
+            {atsResult && <ATSScoreCard result={atsResult} onClose={() => setAtsResult(null)} />}
 
             {/* Tailor Modal */}
             {isTailorOpen && (
