@@ -5,7 +5,7 @@ import { Mail, Lock, User as UserIcon, Loader2, ArrowRight, KeyRound, Layout } f
 
 interface AuthProps {
     onLogin: (user: User) => void;
-    onSwitch: (view: 'LOGIN' | 'SIGNUP' | 'FORGOT_PASSWORD' | 'UPDATE_PASSWORD') => void;
+    onSwitch: (view: 'LANDING' | 'LOGIN' | 'SIGNUP' | 'FORGOT_PASSWORD' | 'UPDATE_PASSWORD') => void;
     view: 'LOGIN' | 'SIGNUP' | 'FORGOT_PASSWORD' | 'UPDATE_PASSWORD';
 }
 
@@ -96,7 +96,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSwitch, view }) => {
         <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 animate-in fade-in duration-500">
             <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-neutral-200 p-8">
                 <div className="text-center mb-8">
-                    <img src="/logo.png" alt="GradCraft" className="w-32 md:w-40 mx-auto mb-6 grayscale" />
+                    <div
+                        className="flex items-center justify-center gap-2 mb-6 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => onSwitch('LANDING')}
+                    >
+                        <div className="w-8 h-8 bg-neutral-900 rounded-[6px] flex items-center justify-center text-white text-sm font-bold">G</div>
+                        <span className="font-serif font-bold text-2xl tracking-tight text-neutral-900">GradCraft</span>
+                    </div>
                     <p className="text-neutral-500 text-xs font-bold uppercase tracking-widest mt-2">{getTitle()}</p>
                     <p className="text-neutral-400 text-sm mt-1 max-w-[280px] mx-auto leading-relaxed">
                         {getDescription()}

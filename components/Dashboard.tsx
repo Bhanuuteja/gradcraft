@@ -1,14 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { User, SavedResume, Application, ApplicationStatus, ResumeData } from '../types';
-import { getUserResumes, deleteResume, getApplications, saveApplication, updateApplicationStatus, saveResume, logout, deleteApplication } from '../services/supabase';
+import { getUserResumes, deleteResume, getApplications, saveApplication, updateApplicationStatus, saveResume, logout, deleteApplication, supabase } from '../services/supabase';
 import { tailorResume, calculateATSScore } from '../services/groqService';
 import TailorReviewDialog from './TailorReviewDialog';
 import ATSScoreCard from './ATSScoreCard';
 import { ATSScoreResult } from '../types';
 
 
-import { FileText, Plus, Trash2, Clock, Sparkles, Building2, Briefcase, Calendar, CheckCircle2, ChevronRight, Loader2, Target, Search, ExternalLink, LogOut, LayoutGrid, ListTodo, Award } from 'lucide-react';
+import { FileText, Plus, Trash2, Clock, Sparkles, Building2, Briefcase, Calendar, CheckCircle2, ChevronRight, Loader2, Target, Search, ExternalLink, LogOut, LayoutGrid, ListTodo, Award, Plug } from 'lucide-react';
 
 interface DashboardProps {
     user: User;
@@ -142,6 +142,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
         }
     };
 
+
+
     const stats = {
         total: apps.length,
         interviewing: apps.filter(a => a.status === 'Interviewing').length,
@@ -154,14 +156,17 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
             <nav className="bg-white border-b border-neutral-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
                 <div className="flex items-center gap-8">
                     <div className="flex items-center gap-2">
-                        <img src="/logo.png" alt="GradCraft" className="h-14 md:h-16 w-auto drop-shadow-sm transition-all grayscale" />
+                        <div className="w-8 h-8 bg-black rounded-[6px] flex items-center justify-center text-white text-xs font-bold">G</div>
+                        <span className="font-serif font-bold text-xl tracking-tight text-neutral-900">GradCraft</span>
                     </div>
                     <div className="hidden md:flex items-center gap-1 bg-neutral-100 p-1 rounded-xl">
                         <button onClick={() => setActiveView('overview')} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all ${activeView === 'overview' ? 'bg-white shadow-sm text-black' : 'text-neutral-500'}`}>OVERVIEW</button>
                         <button onClick={() => setActiveView('tracker')} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all ${activeView === 'tracker' ? 'bg-white shadow-sm text-black' : 'text-neutral-500'}`}>APPLICATIONS</button>
                     </div>
                 </div>
+
                 <div className="flex items-center gap-4">
+
                     <div className="text-right hidden sm:block">
                         <p className="text-xs font-black text-neutral-900 leading-none uppercase tracking-tighter">{user.name}</p>
                         <p className="text-[10px] text-neutral-400 font-medium tracking-tight">{user.email}</p>
@@ -170,7 +175,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                         <LogOut className="w-5 h-5" />
                     </button>
                 </div>
-            </nav>
+            </nav >
 
             <div className="max-w-7xl mx-auto p-6 md:p-10 space-y-10">
                 {/* Hero / CTA */}
@@ -310,121 +315,129 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
             </div>
 
             {/* Loading Overlay */}
-            {isScoring && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white/80 backdrop-blur-sm">
-                    <div className="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl border border-neutral-200">
-                        <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
-                        <h3 className="font-bold text-lg text-neutral-900">Analyzing Resume...</h3>
-                        <p className="text-neutral-500 text-sm">Please wait while the ATS engine grades your resume.</p>
+            {
+                isScoring && (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                        <div className="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl border border-neutral-200">
+                            <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
+                            <h3 className="font-bold text-lg text-neutral-900">Analyzing Resume...</h3>
+                            <p className="text-neutral-500 text-sm">Please wait while the ATS engine grades your resume.</p>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ATS Score Modal */}
             {atsResult && <ATSScoreCard result={atsResult} onClose={() => setAtsResult(null)} />}
 
             {/* ATS Check Input Modal */}
-            {isAtsModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 flex flex-col max-h-[90vh]">
-                        <div className="p-6 md:p-8 border-b border-neutral-100 flex justify-between items-center bg-neutral-50">
-                            <div>
-                                <h3 className="text-xl font-black uppercase tracking-tight text-neutral-900">Check ATS Score</h3>
-                                <p className="text-xs text-neutral-500 font-bold uppercase tracking-wide mt-1">Select a resume and paste the job description to get a grade.</p>
+            {
+                isAtsModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 flex flex-col max-h-[90vh]">
+                            <div className="p-6 md:p-8 border-b border-neutral-100 flex justify-between items-center bg-neutral-50">
+                                <div>
+                                    <h3 className="text-xl font-black uppercase tracking-tight text-neutral-900">Check ATS Score</h3>
+                                    <p className="text-xs text-neutral-500 font-bold uppercase tracking-wide mt-1">Select a resume and paste the job description to get a grade.</p>
+                                </div>
+                                <button onClick={() => setIsAtsModalOpen(false)} className="p-2 hover:bg-neutral-200 rounded-full transition-colors"><div className="w-5 h-5 flex items-center justify-center font-bold">✕</div></button>
                             </div>
-                            <button onClick={() => setIsAtsModalOpen(false)} className="p-2 hover:bg-neutral-200 rounded-full transition-colors"><div className="w-5 h-5 flex items-center justify-center font-bold">✕</div></button>
-                        </div>
-                        <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Resume to Check</label>
-                                <select
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-black/10 outline-none transition-all appearance-none"
-                                    value={selectedBaseresume?.id || ''}
-                                    onChange={(e) => setSelectedBaseResume(resumes.find(r => r.id === e.target.value) || null)}
-                                >
-                                    {resumes.map(r => (
-                                        <option key={r.id} value={r.id}>{r.name}</option>
-                                    ))}
-                                </select>
+                            <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Resume to Check</label>
+                                    <select
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-black/10 outline-none transition-all appearance-none"
+                                        value={selectedBaseresume?.id || ''}
+                                        onChange={(e) => setSelectedBaseResume(resumes.find(r => r.id === e.target.value) || null)}
+                                    >
+                                        {resumes.map(r => (
+                                            <option key={r.id} value={r.id}>{r.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Job Description</label>
+                                    <textarea
+                                        placeholder="Paste the Job Description here..."
+                                        value={atsForm.jd}
+                                        onChange={e => setAtsForm({ jd: e.target.value })}
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-medium text-sm h-64 resize-none focus:ring-2 focus:ring-black/10 outline-none transition-all custom-scrollbar leading-relaxed"
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Job Description</label>
-                                <textarea
-                                    placeholder="Paste the Job Description here..."
-                                    value={atsForm.jd}
-                                    onChange={e => setAtsForm({ jd: e.target.value })}
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-medium text-sm h-64 resize-none focus:ring-2 focus:ring-black/10 outline-none transition-all custom-scrollbar leading-relaxed"
-                                />
+                            <div className="p-6 md:p-8 border-t border-neutral-100 bg-neutral-50 flex justify-end gap-3">
+                                <button onClick={() => setIsAtsModalOpen(false)} className="px-6 py-3 font-bold uppercase tracking-widest text-xs text-neutral-400 hover:text-neutral-600 transition-colors">Cancel</button>
+                                <button onClick={handleRunAtsCheck} disabled={isScoring || !atsForm.jd || !selectedBaseresume} className="bg-black hover:bg-neutral-800 text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-black/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {isScoring ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring...</> : <><Target className="w-4 h-4" /> Check Score</>}
+                                </button>
                             </div>
-                        </div>
-                        <div className="p-6 md:p-8 border-t border-neutral-100 bg-neutral-50 flex justify-end gap-3">
-                            <button onClick={() => setIsAtsModalOpen(false)} className="px-6 py-3 font-bold uppercase tracking-widest text-xs text-neutral-400 hover:text-neutral-600 transition-colors">Cancel</button>
-                            <button onClick={handleRunAtsCheck} disabled={isScoring || !atsForm.jd || !selectedBaseresume} className="bg-black hover:bg-neutral-800 text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-black/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                {isScoring ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring...</> : <><Target className="w-4 h-4" /> Check Score</>}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Tailor Modal */}
-            {isTailorOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 flex flex-col max-h-[90vh]">
-                        <div className="p-6 md:p-8 border-b border-neutral-100 flex justify-between items-center bg-neutral-50">
-                            <div>
-                                <h3 className="text-xl font-black uppercase tracking-tight text-neutral-900">New Application</h3>
-                                <p className="text-xs text-neutral-500 font-bold uppercase tracking-wide mt-1">Tailor resume for a specific role</p>
+            {
+                isTailorOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 flex flex-col max-h-[90vh]">
+                            <div className="p-6 md:p-8 border-b border-neutral-100 flex justify-between items-center bg-neutral-50">
+                                <div>
+                                    <h3 className="text-xl font-black uppercase tracking-tight text-neutral-900">New Application</h3>
+                                    <p className="text-xs text-neutral-500 font-bold uppercase tracking-wide mt-1">Tailor resume for a specific role</p>
+                                </div>
+                                <button onClick={() => setIsTailorOpen(false)} className="p-2 hover:bg-neutral-200 rounded-full transition-colors"><div className="w-5 h-5 flex items-center justify-center font-bold">✕</div></button>
                             </div>
-                            <button onClick={() => setIsTailorOpen(false)} className="p-2 hover:bg-neutral-200 rounded-full transition-colors"><div className="w-5 h-5 flex items-center justify-center font-bold">✕</div></button>
-                        </div>
-                        <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Base Resume</label>
-                                <select
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-black/10 outline-none transition-all appearance-none"
-                                    value={selectedBaseresume?.id || ''}
-                                    onChange={(e) => setSelectedBaseResume(resumes.find(r => r.id === e.target.value) || null)}
-                                >
-                                    {resumes.map(r => (
-                                        <option key={r.id} value={r.id}>{r.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Target Company</label>
-                                    <input placeholder="Ex. Google, Tesla..." value={tailorForm.company} onChange={e => setTailorForm({ ...tailorForm, company: e.target.value })} className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-black/10 outline-none transition-all" />
+                                    <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Base Resume</label>
+                                    <select
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-black/10 outline-none transition-all appearance-none"
+                                        value={selectedBaseresume?.id || ''}
+                                        onChange={(e) => setSelectedBaseResume(resumes.find(r => r.id === e.target.value) || null)}
+                                    >
+                                        {resumes.map(r => (
+                                            <option key={r.id} value={r.id}>{r.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Target Company</label>
+                                        <input placeholder="Ex. Google, Tesla..." value={tailorForm.company} onChange={e => setTailorForm({ ...tailorForm, company: e.target.value })} className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-black/10 outline-none transition-all" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Job Title</label>
+                                        <input placeholder="Ex. Product Designer" value={tailorForm.title} onChange={e => setTailorForm({ ...tailorForm, title: e.target.value })} className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-black/10 outline-none transition-all" />
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Job Title</label>
-                                    <input placeholder="Ex. Product Designer" value={tailorForm.title} onChange={e => setTailorForm({ ...tailorForm, title: e.target.value })} className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-black/10 outline-none transition-all" />
+                                    <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Job Description (JD)</label>
+                                    <textarea placeholder="Paste the full job description here..." value={tailorForm.jd} onChange={e => setTailorForm({ ...tailorForm, jd: e.target.value })} className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-medium text-sm h-64 resize-none focus:ring-2 focus:ring-black/10 outline-none transition-all custom-scrollbar leading-relaxed" />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-neutral-400 tracking-widest px-1">Job Description (JD)</label>
-                                <textarea placeholder="Paste the full job description here..." value={tailorForm.jd} onChange={e => setTailorForm({ ...tailorForm, jd: e.target.value })} className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-medium text-sm h-64 resize-none focus:ring-2 focus:ring-black/10 outline-none transition-all custom-scrollbar leading-relaxed" />
+                            <div className="p-6 md:p-8 border-t border-neutral-100 bg-neutral-50 flex justify-end gap-3">
+                                <button onClick={() => setIsTailorOpen(false)} className="px-6 py-3 font-bold uppercase tracking-widest text-xs text-neutral-400 hover:text-neutral-600 transition-colors">Cancel</button>
+                                <button onClick={handleRunTailor} disabled={isTailoring || !tailorForm.jd} className="bg-black hover:bg-neutral-800 text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-black/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {isTailoring ? <><Loader2 className="w-4 h-4 animate-spin" /> Optimizing...</> : <><Sparkles className="w-4 h-4" /> Create Tailored Resume</>}
+                                </button>
                             </div>
-                        </div>
-                        <div className="p-6 md:p-8 border-t border-neutral-100 bg-neutral-50 flex justify-end gap-3">
-                            <button onClick={() => setIsTailorOpen(false)} className="px-6 py-3 font-bold uppercase tracking-widest text-xs text-neutral-400 hover:text-neutral-600 transition-colors">Cancel</button>
-                            <button onClick={handleRunTailor} disabled={isTailoring || !tailorForm.jd} className="bg-black hover:bg-neutral-800 text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-black/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                {isTailoring ? <><Loader2 className="w-4 h-4 animate-spin" /> Optimizing...</> : <><Sparkles className="w-4 h-4" /> Create Tailored Resume</>}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* AI Review Modal */}
-            {reviewData && (
-                <TailorReviewDialog
-                    original={reviewData.original}
-                    options={reviewData.result}
-                    onSelect={handleReviewSelect}
-                    onCancel={() => setReviewData(null)}
-                />
-            )}
+            {
+                reviewData && (
+                    <TailorReviewDialog
+                        original={reviewData.original}
+                        options={reviewData.result}
+                        onSelect={handleReviewSelect}
+                        onCancel={() => setReviewData(null)}
+                    />
+                )
+            }
         </div >
     );
 };

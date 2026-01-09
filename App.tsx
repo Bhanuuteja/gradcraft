@@ -7,7 +7,7 @@ import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
 import { ResumeData, User } from './types';
 import { getCurrentUser, saveResume, supabase } from './services/supabase';
-import { downloadDocx } from './services/docxService';
+
 import { ArrowLeft, Save, Sparkles, FileDown, Moon, Sun, Layout, Eye, Edit3, Menu, X } from 'lucide-react';
 
 const initialData: ResumeData = {
@@ -42,6 +42,7 @@ function App() {
   const [activeDoc, setActiveDoc] = useState<'resume' | 'cover-letter'>('resume');
   const [status, setStatus] = useState<{ type: 'success' | 'error', msg: string } | null>(null);
   const [mobileMode, setMobileMode] = useState<'edit' | 'preview'>('edit');
+
   const [previewScale, setPreviewScale] = useState(1);
   const previewContainerRef = useRef<HTMLDivElement>(null);
 
@@ -126,12 +127,36 @@ function App() {
     setTimeout(() => setStatus(null), 3000);
   };
 
+  // Auto-Save Logic
+  useEffect(() => {
+    // Only auto-save if we have a resume ID (user has manually saved at least once)
+    if (!currentResumeId || !user) return;
+
+    // Don't auto-save if just loaded (avoid initial trigger)
+    // We can check if resumeData is different from initial or just rely on debounce
+    // Simple debounce:
+    const timer = setTimeout(async () => {
+      setStatus({ type: 'success', msg: 'Saving...' });
+      try {
+        await saveResume(user.id, resumeData, currentResumeId, resumeName);
+        setStatus({ type: 'success', msg: 'Saved' });
+        setTimeout(() => setStatus(null), 2000);
+      } catch (e) {
+        setStatus({ type: 'error', msg: 'Auto-save failed' });
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [resumeData, resumeName, currentResumeId, user]);
+
   const handleSave = async () => {
     if (!user) { setView('LOGIN'); return; }
     try {
+      setStatus({ type: 'success', msg: 'Saving...' });
       const saved = await saveResume(user.id, resumeData, currentResumeId || undefined, resumeName);
       setCurrentResumeId(saved.id);
-      notify('success', 'Saved');
+      setStatus({ type: 'success', msg: 'Saved' });
+      setTimeout(() => setStatus(null), 2000);
     } catch (e: any) { notify('error', 'Sync Failed: ' + e.message); }
   };
 
@@ -232,7 +257,9 @@ function App() {
     printWindow.document.close();
   };
 
-  if (!isDbReady) return <div className="h-screen bg-neutral-900 flex items-center justify-center"><div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div></div>;
+
+
+  if (!isDbReady) return <div className="h-screen bg-white flex items-center justify-center"><div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
     <div className="h-screen overflow-hidden flex flex-col font-sans text-neutral-900 bg-slate-50">
@@ -245,10 +272,12 @@ function App() {
       )}
 
       {view === 'LANDING' && (
-        <LandingPage
-          onStart={() => setView('SIGNUP')}
-          onLogin={() => setView('LOGIN')}
-        />
+        <div className="flex-1 overflow-y-auto bg-slate-50">
+          <LandingPage
+            onStart={() => setView('SIGNUP')}
+            onLogin={() => setView('LOGIN')}
+          />
+        </div>
       )}
 
       {(view === 'LOGIN' || view === 'SIGNUP' || view === 'FORGOT_PASSWORD' || view === 'UPDATE_PASSWORD') && (

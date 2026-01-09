@@ -1,273 +1,169 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { ArrowRight, CheckCircle, FileText, Sparkles, Target, Zap, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, CheckSquare, FileText, Sparkles, Layout, AlignLeft, Star } from 'lucide-react';
 
 interface LandingPageProps {
     onStart: () => void;
     onLogin: () => void;
 }
 
-const companies = [
-    "Google", "Amazon", "Netflix", "Tesla", "Microsoft", "Uber", "Spotify", "Meta", "Airbnb", "Apple"
-];
-
 const LandingPage: React.FC<LandingPageProps> = ({ onStart, onLogin }) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const { scrollYProgress } = useScroll({ target: containerRef });
-
-    // Parallax / Spring effects
-    const springConfig = { stiffness: 100, damping: 30, restDelta: 0.001 };
-    const heroY = useSpring(useTransform(scrollYProgress, [0, 0.2], [0, -50]), springConfig);
-    const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-
     return (
-        <div ref={containerRef} className="min-h-screen bg-slate-50 text-neutral-900 overflow-x-hidden font-sans selection:bg-neutral-900 selection:text-white">
+        <div className="min-h-screen bg-white text-neutral-900 font-sans selection:bg-neutral-200 selection:text-black">
 
-            {/* Navigation */}
-            <nav className="fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-white/80 backdrop-blur-xl border-b border-neutral-200">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold text-lg">G</div>
-                    <span className="font-bold tracking-tight text-xl">GradCraft</span>
+            {/* Navigation - Notion Style */}
+            <nav className="fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-white/95 backdrop-blur-sm border-b border-neutral-200">
+                <div className="flex items-center gap-2 transition-opacity hover:opacity-70 cursor-pointer">
+                    <div className="w-8 h-8 bg-neutral-900 rounded-[6px] flex items-center justify-center text-white text-sm font-bold">G</div>
+                    <span className="font-serif font-bold text-xl tracking-tight text-neutral-900">GradCraft</span>
                 </div>
-                <div className="flex items-center gap-4">
-                    <button onClick={onLogin} className="text-sm font-medium text-neutral-500 hover:text-black transition-colors">Sign In</button>
-                    <button onClick={onStart} className="bg-black text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-neutral-800 transition-colors shadow-lg shadow-black/20">Get Started</button>
+                <div className="flex items-center gap-6">
+                    <button onClick={onLogin} className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">Log in</button>
+                    <button onClick={onStart} className="bg-neutral-900 text-white px-4 py-1.5 rounded-md text-sm font-medium hover:bg-neutral-700 transition-colors">Get Started</button>
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <section className="relative min-h-[110vh] flex flex-col items-center justify-center pt-32 pb-20 px-4 overflow-hidden bg-white">
-                {/* Subtle Mesh Grid Background */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+            {/* Main Content Container */}
+            <div className="max-w-4xl mx-auto pt-32 pb-20 px-6 space-y-24">
 
-                {/* Hero Content */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="text-center z-10 max-w-5xl mx-auto space-y-8 relative"
-                >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-bold text-neutral-600 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 uppercase tracking-wider">
-                        <Sparkles className="w-3 h-3 text-black" />
-                        <span>v2.0 : Brutal ATS Scoring Engine</span>
-                    </div>
+                {/* Hero Section - Document Title Style */}
+                <section className="space-y-6 text-center md:text-left">
 
-                    <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.9] text-black">
-                        CAREER <br />
-                        <span className="text-neutral-400">ARCHITECT.</span>
+                    <h1 className="font-serif text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight text-neutral-900">
+                        The thoughtful way to <br /> build your resume.
                     </h1>
 
-                    <p className="text-xl md:text-2xl text-neutral-500 max-w-2xl mx-auto leading-relaxed font-medium">
-                        Stop sending generic resumes. Build a portfolio that demands attention with AI tailoring and brutal scoring.
+                    <p className="text-xl md:text-2xl text-neutral-600 max-w-2xl leading-relaxed font-light">
+                        GradCraft replaces chaotic formatting with structure. <br />
+                        Write clearly. Score higher. Get hired.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={onStart}
-                            className="px-10 py-5 bg-black text-white text-lg font-bold rounded-full shadow-2xl shadow-black/30 hover:shadow-black/50 transition-all flex items-center gap-2"
-                        >
-                            Build Resume <ArrowRight className="w-5 h-5" />
-                        </motion.button>
-                        <button onClick={onLogin} className="px-8 py-4 text-neutral-500 font-bold hover:text-black transition-colors underline decoration-2 decoration-transparent hover:decoration-black underline-offset-4">
-                            I have an account
+                    <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                        <button onClick={onStart} className="group flex items-center gap-2 bg-neutral-900 text-white px-6 py-3 rounded-md font-medium hover:bg-neutral-800 transition-all">
+                            Start Writing <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                        <button onClick={onStart} className="flex items-center gap-2 px-6 py-3 rounded-md font-medium text-neutral-600 hover:bg-neutral-50 transition-colors border border-neutral-200">
+                            View Templates
                         </button>
                     </div>
-                </motion.div>
+                </section>
 
-                {/* 3D Tilt Card (Modern Clean) */}
-                <motion.div
-                    style={{ y: heroY, opacity }}
-                    className="mt-24 w-full max-w-4xl perspective-1000 relative group"
-                >
-                    {/* Floating Elements */}
-                    <motion.div
-                        animate={{ y: [-10, 10, -10] }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute -top-10 -right-4 md:-right-10 bg-white border border-neutral-200 p-4 rounded-xl flex items-center gap-3 z-20 shadow-xl shadow-neutral-200/50"
-                    >
-                        <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white"><CheckCircle className="w-5 h-5" /></div>
-                        <div>
-                            <p className="text-[10px] text-neutral-400 uppercase font-black tracking-widest">ATS Score</p>
-                            <p className="text-xl font-black text-black">98/100</p>
+                {/* Feature List - Notion Block Style */}
+                <section className="space-y-4">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-6 pl-1">Features</h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Block 1 */}
+                        <div className="p-6 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors group cursor-default">
+                            <div className="w-8 h-8 rounded bg-neutral-100 flex items-center justify-center mb-4 text-neutral-700 group-hover:bg-white group-hover:shadow-sm transition-all">
+                                <AlignLeft className="w-4 h-4" />
+                            </div>
+                            <h4 className="font-serif text-lg font-bold mb-2">Structure First</h4>
+                            <p className="text-neutral-500 text-sm leading-relaxed">
+                                Forget about moving pixels. We handle the layout, padding, and typography so you can focus on the content.
+                            </p>
                         </div>
-                    </motion.div>
 
-                    <motion.div
-                        animate={{ y: [10, -10, 10] }}
-                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                        className="absolute top-40 -left-6 md:-left-20 bg-white border border-neutral-200 p-4 rounded-xl flex items-center gap-3 z-20 shadow-xl shadow-neutral-200/50"
-                    >
-                        <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center text-black"><Sparkles className="w-5 h-5" /></div>
-                        <div>
-                            <p className="text-[10px] text-neutral-400 uppercase font-black tracking-widest">Tailored For</p>
-                            <p className="text-xl font-black text-black">Product Designer</p>
+                        {/* Block 2 */}
+                        <div className="p-6 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors group cursor-default">
+                            <div className="w-8 h-8 rounded bg-neutral-100 flex items-center justify-center mb-4 text-neutral-700 group-hover:bg-white group-hover:shadow-sm transition-all">
+                                <Sparkles className="w-4 h-4" />
+                            </div>
+                            <h4 className="font-serif text-lg font-bold mb-2">AI Refinement</h4>
+                            <p className="text-neutral-500 text-sm leading-relaxed">
+                                Highlight any bullet point and ask our AI to improve clarity, fix grammar, or tailor it to a specific job description.
+                            </p>
                         </div>
-                    </motion.div>
 
-                    {/* Main Resume Visual */}
-                    <div className="relative bg-white rounded-2xl border border-neutral-200 p-2 shadow-2xl shadow-neutral-200 transform rotate-x-6 rotate-y-3 md:group-hover:rotate-0 transition-transform duration-700 ease-out">
-                        <div className="bg-white rounded-xl overflow-hidden h-[400px] md:h-[600px] relative border border-neutral-100">
-                            {/* Mock UI */}
-                            <div className="h-full w-full bg-white p-10 space-y-8">
-                                <div className="h-8 w-1/3 bg-neutral-100 rounded-sm" />
-                                <div className="flex gap-4"><div className="h-4 w-full bg-neutral-100 rounded-sm" /><div className="h-4 w-full bg-neutral-100 rounded-sm" /></div>
-                                <div className="h-px bg-neutral-100 w-full my-8" />
-                                <div className="space-y-4">
-                                    <div className="h-4 w-3/4 bg-neutral-100 rounded-sm" />
-                                    <div className="h-4 w-5/6 bg-neutral-100 rounded-sm" />
-                                    <div className="h-4 w-1/2 bg-neutral-100 rounded-sm" />
-                                </div>
-                                <div className="space-y-4 mt-8">
-                                    <div className="h-6 w-1/4 bg-neutral-200 rounded-sm" />
-                                    <div className="h-4 w-full bg-neutral-100 rounded-sm" />
-                                    <div className="h-4 w-full bg-neutral-100 rounded-sm" />
-                                </div>
+                        {/* Block 3 */}
+                        <div className="p-6 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors group cursor-default">
+                            <div className="w-8 h-8 rounded bg-neutral-100 flex items-center justify-center mb-4 text-neutral-700 group-hover:bg-white group-hover:shadow-sm transition-all">
+                                <CheckSquare className="w-4 h-4" />
+                            </div>
+                            <h4 className="font-serif text-lg font-bold mb-2">ATS Scoring</h4>
+                            <p className="text-neutral-500 text-sm leading-relaxed">
+                                Get a brutally honest score (0-100) based on real parser logic. Fix red flags before you apply.
+                            </p>
+                        </div>
+
+                        {/* Block 4 */}
+                        <div className="p-6 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors group cursor-default">
+                            <div className="w-8 h-8 rounded bg-neutral-100 flex items-center justify-center mb-4 text-neutral-700 group-hover:bg-white group-hover:shadow-sm transition-all">
+                                <FileText className="w-4 h-4" />
+                            </div>
+                            <h4 className="font-serif text-lg font-bold mb-2">Clean PDF</h4>
+                            <p className="text-neutral-500 text-sm leading-relaxed">
+                                Export perfectly accessible, single-column PDFs that robots can read and humans admire.
+                            </p>
+                        </div>
+
+                        {/* Block 5: Dashboard (Full Width) */}
+                        <div className="md:col-span-2 p-6 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors group cursor-default">
+                            <div className="w-8 h-8 rounded bg-neutral-100 flex items-center justify-center mb-4 text-neutral-700 group-hover:bg-white group-hover:shadow-sm transition-all">
+                                <Layout className="w-4 h-4" />
+                            </div>
+                            <h4 className="font-serif text-lg font-bold mb-2">Dashboard</h4>
+                            <p className="text-neutral-500 text-sm leading-relaxed max-w-2xl">
+                                Stop using spreadsheets. Track every application status, link specific resume versions to job descriptions, and see your interview progress in one clean view.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <hr className="border-neutral-200" />
+
+                {/* Testimonials - New Section */}
+                <section className="space-y-6">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-6 pl-1">Wall of Love</h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-100">
+                            <div className="flex gap-1 mb-4 text-black"><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /></div>
+                            <p className="text-sm text-neutral-600 mb-4 leading-relaxed">"Refused to pay for a resume builder. Found GradCraft. It's cleaner than my paid Notion templates."</p>
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-neutral-200"></div>
+                                <span className="text-xs font-bold text-neutral-900">Alex R. <span className="text-neutral-400 font-normal">@ Stanford</span></span>
+                            </div>
+                        </div>
+
+                        <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-100">
+                            <div className="flex gap-1 mb-4 text-black"><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /></div>
+                            <p className="text-sm text-neutral-600 mb-4 leading-relaxed">"The ATS scorer is brutal but necessary. I went from 0 callbacks to 3 interviews in a week."</p>
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-neutral-200"></div>
+                                <span className="text-xs font-bold text-neutral-900">Sarah C. <span className="text-neutral-400 font-normal">@ Berkeley</span></span>
+                            </div>
+                        </div>
+
+                        <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-100">
+                            <div className="flex gap-1 mb-4 text-black"><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /><Star className="w-3 h-3 fill-black" /></div>
+                            <p className="text-sm text-neutral-600 mb-4 leading-relaxed">"Finally, a tool that just formats the text without adding weird graphics that break parsers."</p>
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-neutral-200"></div>
+                                <span className="text-xs font-bold text-neutral-900">James W. <span className="text-neutral-400 font-normal">@ MIT</span></span>
                             </div>
                         </div>
                     </div>
-                </motion.div>
-            </section>
+                </section>
 
-            {/* Infinite Marquee */}
-            <section className="py-12 border-y border-neutral-200 bg-neutral-50 overflow-hidden">
-                <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-neutral-400 mb-8">Trusted by students at</p>
-                <div className="flex w-max gap-20 animate-marquee opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                    {[...companies, ...companies].map((company, i) => (
-                        <h3 key={i} className="text-3xl font-black text-neutral-900 select-none uppercase tracking-tighter">{company}</h3>
-                    ))}
-                </div>
-            </section>
+                <hr className="border-neutral-200" />
 
-            {/* Bento Grid Features */}
-            <section className="py-32 px-4 max-w-7xl mx-auto">
-                <div className="text-center mb-24 space-y-4">
-                    <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-black">BEAT THE <span className="text-neutral-400">ROBOT.</span></h2>
-                    <p className="text-neutral-500 text-xl font-medium max-w-2xl mx-auto">We reverse-engineered the hiring process so you don't have to.</p>
-                </div>
+                {/* Callout Section - Quote style */}
+                <section className="bg-neutral-50 border-l-4 border-neutral-900 p-8 rounded-r-lg">
+                    <h2 className="font-serif text-2xl font-bold mb-4">Why we built this</h2>
+                    <p className="text-neutral-700 leading-relaxed max-w-prose">
+                        "Most resume builders are designed to sell you templates that look pretty but fail in ATS systems.
+                        We built GradCraft to be the anti-template tool. It forces you to write better content within a proven structure."
+                    </p>
+                </section>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(240px,auto)]">
+            </div>
 
-                    {/* Box 1: AI Tailor (Span 2) */}
-                    <motion.div whileHover={{ y: -5 }} className="md:col-span-2 bg-white rounded-3xl border border-neutral-200 shadow-sm overflow-hidden relative group">
-                        <div className="p-10 flex flex-col md:flex-row items-center gap-10 h-full">
-                            <div className="flex-1 space-y-6 z-10">
-                                <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center text-black"><Sparkles /></div>
-                                <h3 className="text-3xl font-bold tracking-tight">Smart Tailoring</h3>
-                                <p className="text-neutral-500 text-lg">Paste any job description. Our AI rewrites your bullets to match keywords instantly.</p>
-                            </div>
-                            <div className="flex-1 w-full relative">
-                                <div className="relative bg-neutral-50 border border-neutral-200 p-6 rounded-xl text-xs font-mono text-neutral-600 shadow-inner">
-                                    <span className="text-black font-bold">&gt; Processing...</span><br />
-                                    Generating keywords: <span className="bg-neutral-200 px-1 rounded">React</span> <span className="bg-neutral-200 px-1 rounded">TypeScript</span><br />
-                                    <span className="text-green-600 font-bold">Match Score: 95%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Box 2: Score (Span 1) */}
-                    <motion.div whileHover={{ y: -5 }} className="bg-white rounded-3xl border border-neutral-200 shadow-sm p-10 flex flex-col justify-between group overflow-hidden">
-                        <div className="space-y-6">
-                            <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-white"><Target /></div>
-                            <h3 className="text-3xl font-bold tracking-tight">Brutal Scores</h3>
-                        </div>
-                        <p className="text-neutral-500">Get a 0-100 score on your ATS compatibility.</p>
-                        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-neutral-100 rounded-full group-hover:scale-150 transition-transform duration-500" />
-                    </motion.div>
-
-                    {/* Box 3: PDF (Span 1) */}
-                    <motion.div whileHover={{ y: -5 }} className="bg-white rounded-3xl border border-neutral-200 shadow-sm p-10 flex flex-col justify-between group overflow-hidden">
-                        <div className="space-y-6">
-                            <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center text-black border border-neutral-200"><FileText /></div>
-                            <h3 className="text-3xl font-bold tracking-tight">Clean PDF</h3>
-                        </div>
-                        <p className="text-neutral-500">ATS-optimized renders. No graphics, no columns, just data.</p>
-                    </motion.div>
-
-                    {/* Box 4: CTA (Span 2) */}
-                    <motion.div whileHover={{ y: -5 }} className="md:col-span-2 bg-neutral-900 rounded-3xl shadow-xl overflow-hidden relative">
-                        <div onClick={onStart} className="cursor-pointer h-full w-full p-10 flex items-center justify-between group relative z-10">
-                            <div>
-                                <h3 className="text-4xl font-black text-white tracking-tight">Start Building Free.</h3>
-                                <p className="text-neutral-400 mt-2">No credit card required.</p>
-                            </div>
-                            <div className="bg-white p-4 rounded-full text-black group-hover:scale-110 transition-all">
-                                <ChevronRight className="w-8 h-8" />
-                            </div>
-                        </div>
-                        {/* Abstract Line Pattern */}
-                        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Pricing Section */}
-            <section className="py-20 px-4 max-w-5xl mx-auto">
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-4">Simple Pricing.</h2>
-                    <p className="text-neutral-500">Invest in your career.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    {/* Free Plan */}
-                    <motion.div whileHover={{ y: -5 }} className="bg-white border border-neutral-200 rounded-3xl p-10 shadow-sm">
-                        <div className="flex justify-between items-start mb-6">
-                            <div>
-                                <h3 className="text-xl font-bold text-neutral-900">Student</h3>
-                                <p className="text-4xl font-black mt-2 tracking-tight">$0 <span className="text-sm font-normal text-neutral-400">/ forever</span></p>
-                            </div>
-                            <div className="px-3 py-1 bg-neutral-100 rounded-full text-xs font-bold uppercase tracking-widest text-neutral-600">Basic</div>
-                        </div>
-                        <ul className="space-y-4 mb-8 text-neutral-600 font-medium">
-                            <li className="flex gap-3 text-sm"><CheckCircle className="w-5 h-5 text-black" /> Unlimited Resumes</li>
-                            <li className="flex gap-3 text-sm"><CheckCircle className="w-5 h-5 text-black" /> Basic PDF Export</li>
-                            <li className="flex gap-3 text-sm"><CheckCircle className="w-5 h-5 text-black" /> Standard Templates</li>
-                        </ul>
-                        <button onClick={onStart} className="w-full py-4 bg-neutral-100 hover:bg-neutral-200 text-black font-bold rounded-xl transition-all">Get Started Free</button>
-                    </motion.div>
-
-                    {/* Pro Plan */}
-                    <motion.div whileHover={{ y: -5 }} className="relative bg-black text-white border border-neutral-800 rounded-3xl p-10 shadow-2xl shadow-neutral-900/20">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest shadow-lg border border-neutral-200">Most Popular</div>
-                        <div className="flex justify-between items-start mb-6">
-                            <div>
-                                <h3 className="text-xl font-bold">Pro Career</h3>
-                                <p className="text-4xl font-black mt-2 tracking-tight">$12 <span className="text-sm font-normal text-neutral-500">/ month</span></p>
-                            </div>
-                            <div className="px-3 py-1 bg-neutral-800 text-white rounded-full text-xs font-bold uppercase tracking-widest"><Zap className="w-3 h-3 inline mr-1" /> Fast Track</div>
-                        </div>
-                        <ul className="space-y-4 mb-8 text-neutral-300 font-medium">
-                            <li className="flex gap-3 text-sm"><CheckCircle className="w-5 h-5 text-white" /> <b>Unlimited AI Tailoring</b></li>
-                            <li className="flex gap-3 text-sm"><CheckCircle className="w-5 h-5 text-white" /> <b>Brutal ATS Score</b> Checks</li>
-                            <li className="flex gap-3 text-sm"><CheckCircle className="w-5 h-5 text-white" /> Priority Support</li>
-                            <li className="flex gap-3 text-sm"><CheckCircle className="w-5 h-5 text-white" /> Cover Letter Generator</li>
-                        </ul>
-                        <button onClick={onStart} className="w-full py-4 bg-white text-black hover:bg-neutral-200 font-bold rounded-xl shadow-lg transition-all">Go Pro</button>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="border-t border-neutral-200 py-20 px-4 text-center bg-white">
-                <div className="flex items-center justify-center gap-2 mb-8 opacity-50">
-                    <div className="w-6 h-6 bg-black rounded-md" />
-                    <span className="font-bold">GradCraft</span>
-                </div>
-                <p className="text-neutral-400 text-sm">© 2025 GradCraft AI. Built for architects of the future.</p>
+            {/* Minimal Footer */}
+            <footer className="border-t border-neutral-200 py-12 text-center text-sm text-neutral-400 font-mono space-y-4">
+                <p>GradCraft &middot; Crafted with intention.</p>
             </footer>
 
-            {/* Styles for marquee */}
-            <style>{`
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-            animation: marquee 30s linear infinite;
-        }
-      `}</style>
         </div>
     );
 };
