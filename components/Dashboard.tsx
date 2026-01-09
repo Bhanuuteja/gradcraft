@@ -220,7 +220,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                                         <div className="flex justify-between items-start mb-3">
                                             <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-neutral-800 flex items-center justify-center text-slate-400 group-hover:text-brand-primary transition-colors"><FileText className="w-4 h-4" /></div>
                                             <div className="flex gap-1">
-                                                <button onClick={(e) => handleCheckScoreCard(e, resume)} className="p-1.5 text-slate-300 hover:text-violet-500 transition-all" title="Check ATS Score"><Award className="w-4 h-4" /></button>
                                                 <button onClick={(e) => handleDeleteResume(e, resume.id)} className="p-1.5 text-slate-300 hover:text-red-500 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                                             </div>
                                         </div>
