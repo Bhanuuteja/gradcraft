@@ -80,17 +80,17 @@ const LivePreview: React.FC<LivePreviewProps> = ({ data, activeDoc = 'resume' })
       <div className="flex flex-wrap justify-center gap-x-5 text-[9px] font-black text-slate-400 mt-2">
         {data.personalInfo.linkedin && (
           <a href={data.personalInfo.linkedin.startsWith('http') ? data.personalInfo.linkedin : `https://${data.personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors flex items-center">
-            LINKEDIN
+            {data.personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
           </a>
         )}
         {data.personalInfo.github && (
           <a href={data.personalInfo.github.startsWith('http') ? data.personalInfo.github : `https://${data.personalInfo.github}`} target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors flex items-center before:content-['•'] before:mr-5 before:text-slate-300">
-            GITHUB
+            {data.personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}
           </a>
         )}
         {data.personalInfo.portfolio && (
           <a href={data.personalInfo.portfolio.startsWith('http') ? data.personalInfo.portfolio : `https://${data.personalInfo.portfolio}`} target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors flex items-center before:content-['•'] before:mr-5 before:text-slate-300">
-            PORTFOLIO
+            {data.personalInfo.portfolio.replace(/^https?:\/\/(www\.)?/, '')}
           </a>
         )}
       </div>
@@ -193,7 +193,6 @@ const LivePreview: React.FC<LivePreviewProps> = ({ data, activeDoc = 'resume' })
                   {edu.coursework && (
                     <div className="text-[8pt] text-slate-600 mt-1 leading-relaxed">
                       <span className="font-black uppercase tracking-[0.15em] text-[7pt] text-slate-400 mr-2">Core Coursework:</span>
-                      <span className="font-black uppercase text-[7pt] text-slate-400 mr-2">Core Coursework:</span>
                       {parseMarkdown(edu.coursework)}
                     </div>
                   )}

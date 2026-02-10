@@ -84,7 +84,13 @@ function App() {
             if (isRecoveryMode) {
               setView('UPDATE_PASSWORD');
             } else {
-              setView(v => v === 'UPDATE_PASSWORD' ? 'UPDATE_PASSWORD' : 'DASHBOARD');
+              // Only redirect to dashboard if we are in an entry state
+              setView(v => {
+                if (['LANDING', 'LOGIN', 'SIGNUP'].includes(v)) {
+                  return 'DASHBOARD';
+                }
+                return v;
+              });
             }
           }
         }, 100);

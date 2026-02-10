@@ -5,10 +5,12 @@ import { getUserResumes, deleteResume, getApplications, saveApplication, updateA
 import { tailorResume, calculateATSScore } from '../services/groqService';
 import TailorReviewDialog from './TailorReviewDialog';
 import ATSScoreCard from './ATSScoreCard';
+import ApiKeyModal from './ApiKeyModal';
 import { ATSScoreResult } from '../types';
 
 
-import { FileText, Plus, Trash2, Clock, Sparkles, Building2, Briefcase, Calendar, CheckCircle2, ChevronRight, Loader2, Target, Search, ExternalLink, LogOut, LayoutGrid, ListTodo, Award, Plug } from 'lucide-react';
+import { FileText, Plus, Trash2, Clock, Sparkles, Building2, Briefcase, Calendar, CheckCircle2, ChevronRight, Loader2, Target, Search, ExternalLink, LogOut, LayoutGrid, ListTodo, Award, Plug, Settings } from 'lucide-react';
+
 
 interface DashboardProps {
     user: User;
@@ -34,6 +36,20 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
     const [isScoring, setIsScoring] = useState(false);
     const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
     const [atsForm, setAtsForm] = useState({ jd: '' });
+
+    // Settings State
+    const [userApiKey, setUserApiKey] = useState('');
+    const [showSettings, setShowSettings] = useState(false);
+
+    useEffect(() => {
+        const storedKey = localStorage.getItem('user_groq_api_key');
+        if (storedKey) setUserApiKey(storedKey);
+    }, []);
+
+    const handleSaveKey = (key: string) => {
+        localStorage.setItem('user_groq_api_key', key);
+        setUserApiKey(key);
+    };
 
     useEffect(() => {
         refresh();
@@ -77,7 +93,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
         if (!selectedBaseresume || !tailorForm.jd) return;
         setIsTailoring(true);
         try {
-            const tailoredResult = await tailorResume(selectedBaseresume.data, tailorForm.jd);
+            // Pass userApiKey (if valid)
+            const tailoredResult = await tailorResume(selectedBaseresume.data, tailorForm.jd, userApiKey);
             // Open Review Dialog
             setReviewData({
                 original: selectedBaseresume.data,
@@ -171,6 +188,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                         <p className="text-xs font-black text-neutral-900 leading-none uppercase tracking-tighter">{user.name}</p>
                         <p className="text-[10px] text-neutral-400 font-medium tracking-tight">{user.email}</p>
                     </div>
+                    <button onClick={() => setShowSettings(true)} className="p-2.5 hover:bg-neutral-100 text-neutral-400 hover:text-black rounded-xl transition-all" title="Settings">
+                        <Settings className="w-5 h-5" />
+                    </button>
                     <button onClick={handleLogout} className="p-2.5 hover:bg-neutral-100 text-neutral-400 hover:text-black rounded-xl transition-all" title="Logout">
                         <LogOut className="w-5 h-5" />
                     </button>
@@ -435,9 +455,18 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onEdit, onNew, onLogout }) 
                         options={reviewData.result}
                         onSelect={handleReviewSelect}
                         onCancel={() => setReviewData(null)}
+                        userApiKey={userApiKey}
                     />
                 )
             }
+
+            {/* Settings Modal */}
+            <ApiKeyModal
+                isOpen={showSettings}
+                onClose={() => setShowSettings(false)}
+                onSave={handleSaveKey}
+                initialKey={userApiKey}
+            />
         </div >
     );
 };

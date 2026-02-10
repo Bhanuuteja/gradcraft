@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { ResumeData, Experience, Education, Project, CustomSection, ResumeDesign } from '../types';
 import { generateId } from '../utils';
-import { Plus, Trash2, Briefcase, GraduationCap, User, Code, FolderGit2, ArrowUp, ArrowDown, ChevronRight, ChevronLeft, Palette, Type as TypeIcon, LayoutTemplate, Layers, Mail } from 'lucide-react';
+import { Plus, Trash2, Briefcase, GraduationCap, User, Code, FolderGit2, ArrowUp, ArrowDown, ChevronRight, ChevronLeft, Palette, Type as TypeIcon, LayoutTemplate, Layers, Mail, Upload } from 'lucide-react';
 import RichTextarea from './RichTextarea';
+import { parseResumeFile } from '../services/resumeParser';
 
 interface ResumeFormProps {
     data: ResumeData;
@@ -46,6 +47,27 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, activeDoc }) =>
         onChange({ ...data, design: { ...data.design, [field]: value } });
     };
 
+    const handleImportResume = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const parsedData = await parseResumeFile(file);
+            // Merge parsed data with existing data
+            const mergedData = {
+                ...data,
+                personalInfo: { ...data.personalInfo, ...parsedData.personalInfo },
+                skills: parsedData.skills ? parsedData.skills : data.skills,
+                // We don't overwrite arrays like experience/projects because naive parsing is destructive
+            };
+            onChange(mergedData);
+            alert('Resume imported! Please review the details.');
+        } catch (error) {
+            console.error('Import failed', error);
+            alert('Failed to parse resume. Please try another file.');
+        }
+    };
+
     const moveItem = <T,>(list: T[], index: number, direction: 'up' | 'down'): T[] => {
         const newList = [...list];
         if (direction === 'up' && index > 0) [newList[index], newList[index - 1]] = [newList[index - 1], newList[index]];
@@ -66,7 +88,17 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, activeDoc }) =>
                         <span className={`${isNavCollapsed ? 'lg:hidden' : 'block'}`}>{section.label}</span>
                     </button>
                 ))}
-                <button onClick={() => setIsNavCollapsed(!isNavCollapsed)} className="hidden lg:flex mt-auto p-6 justify-center text-slate-300 hover:text-brand-primary transition-colors">
+
+
+                <div className="mt-auto p-4 border-t border-slate-200 dark:border-neutral-900 space-y-2">
+                    <label className={`flex items-center gap-3 px-2 py-3 rounded-xl cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-colors text-slate-600 dark:text-slate-300 ${isNavCollapsed ? 'justify-center' : ''}`}>
+                        <Upload className="w-4 h-4 shrink-0" />
+                        {!isNavCollapsed && <span className="text-[10px] font-black uppercase tracking-widest">Import Resume</span>}
+                        <input type="file" accept=".pdf,.docx" className="hidden" onChange={handleImportResume} />
+                    </label>
+                </div>
+
+                <button onClick={() => setIsNavCollapsed(!isNavCollapsed)} className="hidden lg:flex p-6 justify-center text-slate-300 hover:text-brand-primary transition-colors">
                     {isNavCollapsed ? <ChevronRight /> : <ChevronLeft />}
                 </button>
             </nav>
@@ -292,6 +324,16 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, activeDoc }) =>
                                     <p className="text-blue-100 opacity-80 text-xs md:text-sm">Draft your customized cover letter.</p>
                                 </div>
                             </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider px-1">Date</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. October 24, 2024"
+                                    value={data.coverLetter.date}
+                                    onChange={e => onChange({ ...data, coverLetter: { ...data.coverLetter, date: e.target.value } })}
+                                    className="input-field py-2.5 px-4 text-sm font-medium"
+                                />
+                            </div>
                             <RichTextarea
                                 value={data.coverLetter.content}
                                 onChangeValue={v => onChange({ ...data, coverLetter: { ...data.coverLetter, content: v } })}
@@ -422,7 +464,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, activeDoc }) =>
                     )}
                 </div>
             </div>
-        </div>
+        </div >
 
     );
 };

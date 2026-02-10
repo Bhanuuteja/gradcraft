@@ -14,9 +14,10 @@ interface TailorReviewDialogProps {
     };
     onSelect: (selected: ResumeData, label: string) => void;
     onCancel: () => void;
+    userApiKey?: string;
 }
 
-const TailorReviewDialog: React.FC<TailorReviewDialogProps> = ({ original, options, onSelect, onCancel }) => {
+const TailorReviewDialog: React.FC<TailorReviewDialogProps> = ({ original, options, onSelect, onCancel, userApiKey }) => {
     // We keep local state for the options because they can be REFINED by the user
     // "A" and "B" are the starting points. "Custom" captures refinements.
     const [currentData, setCurrentData] = useState<ResumeData>(options.optionA);
@@ -38,7 +39,7 @@ const TailorReviewDialog: React.FC<TailorReviewDialogProps> = ({ original, optio
         if (!chatInput.trim()) return;
         setIsRefining(true);
         try {
-            const refined = await refineResume(currentData, chatInput);
+            const refined = await refineResume(currentData, chatInput, userApiKey);
             setCurrentData(refined); // Update the preview immediately
             setChatInput('');
             setFeedback("Applied your feedback! ✨");
